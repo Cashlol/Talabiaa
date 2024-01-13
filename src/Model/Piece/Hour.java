@@ -11,6 +11,18 @@ public class Hour extends Piece{
         image = getImage((color==0) ? "/res/b-hour" : "/res/y-hour");
     }
 
+    @Override
+    public boolean canMove(int targetCol, int targetRow) {
+        // Check if the new position is a valid L-shaped move
+        int colDiff = Math.abs(targetCol - getCol());
+        int rowDiff = Math.abs(targetRow - getRow());
+
+        if((colDiff == 1 && rowDiff == 2) || (colDiff == 2 && rowDiff == 1)){
+            return true;
+        }
+        return false;
+    }
+
     //display the piece symbol
     //blue = 0, uppercase symbol
     //yellow = 1, lowercase symbol
