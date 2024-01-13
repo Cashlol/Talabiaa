@@ -13,6 +13,16 @@ public class Sun extends Piece{
         
     }
 
+    @Override
+    public boolean canMove(int targetCol, int targetRow) {
+        if (Math.abs(targetCol - getCol()) <= 1 && Math.abs(targetRow - getRow()) <= 1)
+        {
+            return true;
+        }
+        return false;
+    }
+        
+
     //display the piece symbol
     //blue = 0, uppercase symbol
     //yellow = 1, lowercase symbol
