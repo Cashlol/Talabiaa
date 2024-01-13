@@ -6,15 +6,17 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.w3c.dom.events.MouseEvent;
+
 import Model.Board;
 
-public class Piece {
+public class Piece{
     
     public BufferedImage image;
     private int x,y;
     private int col,row;
     private int color;
-    private Boolean hasPiece=false;
+
 
     private Board board;
 
@@ -22,7 +24,6 @@ public class Piece {
         this.color=color;
         this.col=col;
         this.row=row;
-        hasPiece=true;
         x = getX(col);
         y = getY(row);
     }
@@ -63,20 +64,15 @@ public class Piece {
     public void setCol(int newCol) {
         col = newCol;
     }
-
+    
     public void setRow(int newRow) {
-        col = newRow;
+        // Update the correct variable, which is row
+        row = newRow;
     }
 
     //setter function to set board object
     public void setBoard(Board board) {
         this.board = board;
-    }
-
-    public void movePiece() {}
-
-    public Boolean hasPiece() {
-        return hasPiece=true;
     }
 
     //draw the game pieces based on the given parameter of :
@@ -85,6 +81,23 @@ public class Piece {
     //image size
     public void draw(Graphics2D g2) {
         g2.drawImage(image,x,y,100,100,null);
+    }
+
+    public void drawAtCurrentPosition(Graphics2D g2) {
+        int currentX = getCol() * 100;
+        int currentY = getRow() * 100;
+        g2.drawImage(image, currentX, currentY, 100, 100, null);
+    }
+
+    // New method to check if the mouse is over the piece
+    public boolean isMouseOver(int mouseX, int mouseY) {
+        int pieceX = getX(this.col);
+        int pieceY = getY(this.row);
+        int pieceWidth = 100; // Replace with your actual piece width
+        int pieceHeight = 100; // Replace with your actual piece height
+
+        return (mouseX >= pieceX && mouseX <= pieceX + pieceWidth &&
+                mouseY >= pieceY && mouseY <= pieceY + pieceHeight);
     }
 
     //removes the object location returned when subclasses symbol is printed

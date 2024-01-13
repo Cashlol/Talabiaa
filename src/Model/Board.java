@@ -18,6 +18,8 @@ public class Board extends JPanel{
     private static final int BLUE=0,YELLOW=1;
     private static final int COLS=7,ROWS=6;
     private Piece [][] piece;
+    Model.Piece.Mouse mouse;
+    private Piece activeP;
 
     BoardView bv = new BoardView();
 
@@ -27,12 +29,17 @@ public class Board extends JPanel{
     public Board() {
         setSize(700,700);
         piece = new Piece[ROWS][COLS];
+        activeP= null;// No active piece initially
+        mouse = new Model.Piece.Mouse(this);
+        addMouseMotionListener(mouse);
+        addMouseListener(mouse);
     }
 
     //launch game calls function to initialize the board
     public void launchGame() {
         // setPieces();
         setBoardPiece();
+        // Register the board as an observer
     }
 
     //set piece based on the given col and row value
@@ -57,7 +64,7 @@ public class Board extends JPanel{
         }
 
         //add yellow pieces 
-        addPiece(new Plus(YELLOW,0,3));
+        addPiece(new Plus(YELLOW,0,5));
         addPiece(new Hour(YELLOW,1,5));
         addPiece(new Time(YELLOW,2,5));
         addPiece(new Sun(YELLOW,3,5));
@@ -87,9 +94,54 @@ public class Board extends JPanel{
         }
 
         repaint();
-
     }
 
+    public void update() {
+        if (mouse.pressed) {
+            if (activeP == null) {
+                for (int x = 0; x < ROWS; x++) {
+                    for (int y = 0; y < COLS; y++) {
+                        if (piece[x][y] != null && piece[x][y].isMouseOver(mouse.x, mouse.y)) {
+                            activeP = piece[x][y];
+                            System.out.println("Active Piece: " + activeP);
+                            break;  // Stop searching once an active piece is found
+                        }
+                    }
+                }
+            }
+        } else if (activeP != null) {
+            // If the player is holding a piece and the mouse is released, simulate the move
+            simulate();
+            activeP = null;  // Reset the active piece after the move
+        }
+    }
+    
+    private void simulate() {
+        // If a piece is being held, update its position
+        if (activeP != null) {
+            // Set the new position based on the current mouse coordinates
+            int newRow = mouse.y / 100;  // Assuming mouse.y represents the new row
+            int newCol = mouse.x / 100;  // Assuming mouse.x represents the new column
+    
+            // Check if the new position is valid and the cell is empty
+            if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS && piece[newRow][newCol] == null) {
+                // Clear the old position
+                int oldRow = activeP.getRow();
+                int oldCol = activeP.getCol();
+                this.piece[oldRow][oldCol] = null;
+    
+                // Update the active piece's position
+                activeP.setRow(newRow);
+                activeP.setCol(newCol);
+    
+                // Add the piece to the new position
+                this.piece[newRow][newCol] = activeP;
+    
+                repaint();
+            }
+        }
+    }
+    
     // public void flipBoard() {
 
     //     for (int x = 0; x < ROWS / 2; x++) {
@@ -105,46 +157,19 @@ public class Board extends JPanel{
     //     repaint();
     // }
 
-    public void doesSomething() {
-        movePiece(new Plus(YELLOW,0,5),3,0);
-
-        for(int x=0;x<ROWS;x++) {
-            for(int y=0;y<COLS;y++) {
-                if(piece[x][y] != null) {
-                    System.out.print(piece[x][y] + " ");
-                } else {
-                    System.out.print("   ");
-                }
-            }
-            System.out.println(" ");
-        }
-
-        System.out.println("clicking");
-    }
-
-    public void movePiece(Piece piece, int newRow, int newCol) {
-        this.piece[piece.getRow()][piece.getCol()] = null;
-        piece.setRow(newRow);
-        piece.setCol(newCol);
-        this.setPiece(piece);
-
-        repaint();
-    }
-
     //draws the images for each pieces that was passed from the arraylist Piece
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D)g;
+        Graphics2D g2 = (Graphics2D) g;
         bv.draw(g2);
-
-        //draw image for each piece that is not null
-        for(int x=0;x<ROWS;x++) {
-            for(int y=0;y<COLS;y++) {
-                if(piece[x][y] != null) {
-                    piece[x][y].draw(g2);
+    
+        // Draw image for each piece that is not null in its updated position
+        for (int x = 0; x < ROWS; x++) {
+            for (int y = 0; y < COLS; y++) {
+                if (piece[x][y] != null) {
+                    piece[x][y].drawAtCurrentPosition(g2);
                 }
             }
         }
-
     }
 }

@@ -33,7 +33,7 @@ public class SidePanel extends JPanel{
 
         testMove.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                board.doesSomething();
+                //board.doesSomething();
             }
         });
 
