@@ -10,7 +10,7 @@ import org.w3c.dom.events.MouseEvent;
 
 import Model.Board;
 
-public class Piece{
+public class Piece implements MoveRules{
     
     public BufferedImage image;
     private int x,y;
@@ -18,7 +18,7 @@ public class Piece{
     private int color;
 
 
-    private Board board;
+    protected Board board;
 
     public Piece(int color, int col, int row) {
         this.color=color;
@@ -73,6 +73,12 @@ public class Piece{
     //setter function to set board object
     public void setBoard(Board board) {
         this.board = board;
+    }
+
+    @Override
+    public boolean canMove(int targetCol, int targetRow) {
+        // default implementation (can be overridden by subclasses)
+        return true;
     }
 
     //draw the game pieces based on the given parameter of :
