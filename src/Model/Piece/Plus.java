@@ -13,6 +13,38 @@ public class Plus extends Piece{
         
     }
 
+    @Override
+public boolean canMove(int targetCol, int targetRow) {
+    // Check if the new position is a valid horizontal or vertical move
+    int colDiff = Math.abs(targetCol - getCol());
+    int rowDiff = Math.abs(targetRow - getRow());
+
+    if ((colDiff == 0 && rowDiff > 0) || (colDiff > 0 && rowDiff == 0)) {
+        // Check if there are no pieces in the path
+        int colIncrement = (targetCol > getCol()) ? 1 : (targetCol < getCol()) ? -1 : 0;
+        int rowIncrement = (targetRow > getRow()) ? 1 : (targetRow < getRow()) ? -1 : 0;
+
+        int currentCol = getCol() + colIncrement;
+        int currentRow = getRow() + rowIncrement;
+
+        while (currentCol != targetCol || currentRow != targetRow) {
+            if (board.getPieceArray()[currentRow][currentCol] != null) {
+                // There is a piece in the path, cannot move
+                return false;
+            }
+
+            currentCol += colIncrement;
+            currentRow += rowIncrement;
+        }
+
+        // No pieces in the path, valid move
+        return true;
+    }
+
+    return false;
+}
+
+
     //display the piece symbol
     //blue = 0, uppercase symbol
     //yellow = 1, lowercase symbol
