@@ -54,6 +54,11 @@ public class Board extends JPanel{
         piece.setBoard(this);
     }
 
+    // Getter method for the piece array
+    public Piece[][] getPieceArray() {
+        return piece;
+    }
+
     //initialize board pieces into their respective coordinates
     public void setBoardPiece() {
 
@@ -120,23 +125,25 @@ public class Board extends JPanel{
         // If a piece is being held, update its position
         if (activeP != null) {
             // Set the new position based on the current mouse coordinates
-            int newRow = mouse.y / 100;  // Assuming mouse.y represents the new row
-            int newCol = mouse.x / 100;  // Assuming mouse.x represents the new column
-    
+            int newRow = mouse.y / 100;
+            int newCol = mouse.x / 100;
+
             // Check if the new position is valid and the cell is empty
-            if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS && piece[newRow][newCol] == null) {
+            if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS
+                    && piece[newRow][newCol] == null
+                    && activeP.canMove(newCol, newRow)) { // use canMove method
                 // Clear the old position
                 int oldRow = activeP.getRow();
                 int oldCol = activeP.getCol();
                 this.piece[oldRow][oldCol] = null;
-    
+
                 // Update the active piece's position
                 activeP.setRow(newRow);
                 activeP.setCol(newCol);
-    
+
                 // Add the piece to the new position
                 this.piece[newRow][newCol] = activeP;
-    
+
                 repaint();
             }
         }
