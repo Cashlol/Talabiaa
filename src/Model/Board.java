@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class Board extends JPanel{
     
     private static final int BLUE=0,YELLOW=1;
-    private static final int COLS=7,ROWS=6;
+    public static final int COLS=7,ROWS=6;
     private Piece [][] piece;
     Model.Piece.Mouse mouse;
     private Piece activeP;
@@ -127,27 +127,35 @@ public class Board extends JPanel{
             // Set the new position based on the current mouse coordinates
             int newRow = mouse.y / 100;
             int newCol = mouse.x / 100;
-
-            // Check if the new position is valid and the cell is empty
-            if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS
-                    && piece[newRow][newCol] == null
-                    && activeP.canMove(newCol, newRow)) { // use canMove method
-                // Clear the old position
-                int oldRow = activeP.getRow();
-                int oldCol = activeP.getCol();
-                this.piece[oldRow][oldCol] = null;
-
-                // Update the active piece's position
-                activeP.setRow(newRow);
-                activeP.setCol(newCol);
-
-                // Add the piece to the new position
-                this.piece[newRow][newCol] = activeP;
-
-                repaint();
+    
+            // Check if the new position is valid
+            if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS) {
+                // Check if the target cell is empty or contains an opponent's piece
+                if ((piece[newRow][newCol] == null || activeP.canCapture(newCol, newRow))
+                    && activeP.canMove(newCol, newRow)) {
+                    // If there is an opponent's piece, remove it
+                    if (piece[newRow][newCol] != null && activeP.canCapture(newCol, newRow)) {
+                        // Remove the captured piece
+                        piece[newRow][newCol] = null;
+                    }
+    
+                    // Clear the old position
+                    int oldRow = activeP.getRow();
+                    int oldCol = activeP.getCol();
+                    this.piece[oldRow][oldCol] = null;
+    
+                    // Update the active piece's position
+                    activeP.setRow(newRow);
+                    activeP.setCol(newCol);
+    
+                    // Add the piece to the new position
+                    this.piece[newRow][newCol] = activeP;
+    
+                    repaint();
+                }
             }
         }
-    }
+    } 
     
     // public void flipBoard() {
 
