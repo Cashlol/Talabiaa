@@ -13,7 +13,8 @@ import Model.Board;
 public class Piece{
     
     public BufferedImage image;
-    private int x,y;
+    public int x,y;
+
     private int col,row;
     private int color;
 
@@ -84,10 +85,9 @@ public class Piece{
     }
 
     public void drawAtCurrentPosition(Graphics2D g2) {
-        int currentX = getCol() * 100;
-        int currentY = getRow() * 100;
-        g2.drawImage(image, currentX, currentY, 100, 100, null);
+        g2.drawImage(image, x, y, 100, 100, null);
     }
+    
 
     // New method to check if the mouse is over the piece
     public boolean isMouseOver(int mouseX, int mouseY) {
