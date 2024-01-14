@@ -1,7 +1,9 @@
 package Model;
 import View.BoardView;
 
+
 import javax.swing.*;
+
 
 import Model.Piece.Hour;
 import Model.Piece.Piece;
@@ -10,20 +12,25 @@ import Model.Piece.Point;
 import Model.Piece.Sun;
 import Model.Piece.Time;
 
+
 import java.awt.*;
 import java.util.ArrayList;
 
+
 public class Board extends JPanel{
-    
+   
     private static final int BLUE=0,YELLOW=1;
-    private static final int COLS=7,ROWS=6;
+    protected static final int COLS=7,ROWS=6;
     private Piece [][] piece;
     Model.Piece.Mouse mouse;
     private Piece activeP;
 
+
     BoardView bv = new BoardView();
 
+
     // public static ArrayList<Piece> pieces = new ArrayList<>();
+
 
     //constructor to initialize the Piece array
     public Board() {
@@ -35,6 +42,7 @@ public class Board extends JPanel{
         addMouseListener(mouse);
     }
 
+
     //launch game calls function to initialize the board
     public void launchGame() {
         // setPieces();
@@ -42,11 +50,13 @@ public class Board extends JPanel{
         // Register the board as an observer
     }
 
+
     //set piece based on the given col and row value
     public void setPiece(Piece piece){
         this.piece[piece.getRow()][piece.getCol()] = piece;
         piece.setBoard(this);
     }
+
 
     //add piece based on the given col and row value
     public void addPiece(Piece piece){
@@ -54,8 +64,10 @@ public class Board extends JPanel{
         piece.setBoard(this);
     }
 
+
     //initialize board pieces into their respective coordinates
     public void setBoardPiece() {
+
 
         //add point pieces for both yellow and blue
         for(int x=0;x<COLS;x++) {
@@ -63,7 +75,8 @@ public class Board extends JPanel{
             addPiece(new Point(BLUE,x,1));
         }
 
-        //add yellow pieces 
+
+        //add yellow pieces
         addPiece(new Plus(YELLOW,0,5));
         addPiece(new Hour(YELLOW,1,5));
         addPiece(new Time(YELLOW,2,5));
@@ -71,7 +84,7 @@ public class Board extends JPanel{
         addPiece(new Time(YELLOW,4,5));
         addPiece(new Hour(YELLOW,5,5));
         addPiece(new Plus(YELLOW,6,5));
-        
+       
         //add blue pieces
         addPiece(new Plus(BLUE,0,0));
         addPiece(new Hour(BLUE,1,0));
@@ -80,6 +93,7 @@ public class Board extends JPanel{
         addPiece(new Time(BLUE,4,0));
         addPiece(new Hour(BLUE,5,0));
         addPiece(new Plus(BLUE,6,0));
+
 
         //testing the array output for the pieces
         for(int x=0;x<ROWS;x++) {
@@ -93,8 +107,10 @@ public class Board extends JPanel{
             System.out.println(" ");
         }
 
+
         repaint();
     }
+
 
     public void update() {
         if (mouse.pressed) {
@@ -109,40 +125,50 @@ public class Board extends JPanel{
                     }
                 }
             }
-        } else if (activeP != null) {
+   
+            if (activeP != null) {
+                // Update the position of the active piece with the current mouse coordinates
+                activeP.x = mouse.x - 50; //50 is half of the piece size, minus 50 is to make the mouse locate at the middle of the piece
+                activeP.y = mouse.y - 50;
+                repaint();
+            }
+        }
+        else if (activeP != null) {
             // If the player is holding a piece and the mouse is released, simulate the move
             simulate();
             activeP = null;  // Reset the active piece after the move
         }
     }
-    
+   
+   
     private void simulate() {
         // If a piece is being held, update its position
         if (activeP != null) {
             // Set the new position based on the current mouse coordinates
-            int newRow = mouse.y / 100;  // Assuming mouse.y represents the new row
-            int newCol = mouse.x / 100;  // Assuming mouse.x represents the new column
-    
+            int newRow = mouse.y /100;  // Assuming mouse.y represents the new row
+            int newCol = mouse.x /100;  // Assuming mouse.x represents the new column
+   
             // Check if the new position is valid and the cell is empty
             if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS && piece[newRow][newCol] == null) {
                 // Clear the old position
                 int oldRow = activeP.getRow();
                 int oldCol = activeP.getCol();
                 this.piece[oldRow][oldCol] = null;
-    
+   
                 // Update the active piece's position
                 activeP.setRow(newRow);
                 activeP.setCol(newCol);
-    
+   
                 // Add the piece to the new position
                 this.piece[newRow][newCol] = activeP;
-    
+   
                 repaint();
             }
         }
     }
-    
+   
     // public void flipBoard() {
+
 
     //     for (int x = 0; x < ROWS / 2; x++) {
     //         for (int y = 0; y < COLS; y++) {
@@ -153,16 +179,18 @@ public class Board extends JPanel{
     //         }
     //     }
 
+
     //     // Redraw the board
     //     repaint();
     // }
+
 
     //draws the images for each pieces that was passed from the arraylist Piece
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         bv.draw(g2);
-    
+   
         // Draw image for each piece that is not null in its updated position
         for (int x = 0; x < ROWS; x++) {
             for (int y = 0; y < COLS; y++) {
