@@ -6,8 +6,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.w3c.dom.events.MouseEvent;
-
 import Model.Board;
 
 public class Piece{
@@ -19,7 +17,7 @@ public class Piece{
     private int color;
 
 
-    private Board board;
+    protected Board board;
 
     public Piece(int color, int col, int row) {
         this.color=color;
@@ -99,6 +97,21 @@ public class Piece{
         return (mouseX >= pieceX && mouseX <= pieceX + pieceWidth &&
                 mouseY >= pieceY && mouseY <= pieceY + pieceHeight);
     }
+
+    public boolean MoveValidate(int goCol, int goRow)
+    {
+        //override by subclass
+        return true;
+    }
+
+    public boolean canCapture(int goRow, int goCol) {
+        // Get the piece at the target position
+        Piece targetPiece = board.getPiece(goRow,goCol);
+    
+        // Check if there is a piece at the target position and it belongs to the opposite team
+        return (targetPiece != null && targetPiece.color != this.color);
+    }
+
 
     //removes the object location returned when subclasses symbol is printed
     @Override
