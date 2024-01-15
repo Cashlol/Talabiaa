@@ -28,7 +28,6 @@ public class Mouse extends MouseAdapter {
     public void mouseDragged(MouseEvent e){
         x = e.getX();
         y = e.getY();
-        System.out.println("Mouse coordinates - X: " + x + ", Y: " + y);
         board.update();
     }
 

@@ -136,7 +136,19 @@ public class Board extends JPanel{
     
                 // Add the piece to the new position
                 this.piece[newRow][newCol] = activeP;
-    
+
+                //testing the array output for the pieces #CAN REMOVE LATER
+                for(int x=0;x<ROWS;x++) {
+                    for(int y=0;y<COLS;y++) {
+                        if(piece[x][y] != null) {
+                            System.out.print(piece[x][y] + " ");
+                        } else {
+                            System.out.print("   ");
+                        }
+                    }
+                    System.out.println(" ");
+                }
+                
                 repaint();
             }
         }
