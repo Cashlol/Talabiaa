@@ -8,21 +8,23 @@ import javax.imageio.ImageIO;
 
 import Model.Board;
 
-public class Piece{
-    
+public class Piece {
+
     public BufferedImage image;
-    public int x,y;
+    public int x, y;
 
-    private int col,row;
+    private int col, row;
     private int color;
-
+    private PieceType pieceType; // Use the enumeration type here
 
     protected Board board;
 
-    public Piece(int color, int col, int row) {
-        this.color=color;
-        this.col=col;
-        this.row=row;
+
+    public Piece(PieceType pieceType, int color, int col, int row) {
+        this.pieceType = pieceType;
+        this.color = color;
+        this.col = col;
+        this.row = row;
         x = getX(col);
         y = getY(row);
     }
@@ -38,6 +40,15 @@ public class Piece{
             e.printStackTrace();
         }
         return image;
+    }
+    // Getter method for pieceType
+    public PieceType getPieceType() {
+        return pieceType;
+    }
+
+    // Enum to represent different piece types
+    public enum PieceType {
+        POINT, HOURGLASS, TIME, PLUS, SUN
     }
 
     //return image x coordinate according to tile size
@@ -58,6 +69,12 @@ public class Piece{
     //getter function to return row value
     public int getRow() {
         return row;
+    }
+
+    //getter function to return color value
+    public int getColor()
+    {
+        return color;
     }
 
     public void setCol(int newCol) {
@@ -98,9 +115,10 @@ public class Piece{
                 mouseY >= pieceY && mouseY <= pieceY + pieceHeight);
     }
 
-    public boolean MoveValidate(int goCol, int goRow)
+    public boolean moveValidate(int goCol, int goRow)
     {
         //override by subclass
+
         return true;
     }
 
@@ -111,8 +129,6 @@ public class Piece{
         // Check if there is a piece at the target position and it belongs to the opposite team
         return (targetPiece != null && targetPiece.color != this.color);
     }
-
-
     //removes the object location returned when subclasses symbol is printed
     @Override
     public String toString() {

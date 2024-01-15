@@ -6,7 +6,7 @@ public class Sun extends Piece{
     
     //constuctor to pass color, column and row into super class
     public Sun(int color, int col, int row) {
-        super(color, col, row);
+        super(PieceType.SUN, color, col, row);
         this.color=color;
         //check which color is the piece and return their respective imagepath
         image = getImage((color==0) ? "/res/b-sun" : "/res/y-sun");

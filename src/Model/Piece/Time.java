@@ -6,7 +6,7 @@ public class Time extends Piece {
 
     //constuctor to pass color, column and row into super class
     public Time(int color, int col, int row) {
-        super(color, col, row);
+        super(PieceType.TIME,color, col, row);
         this.color=color;
         //check which color is the piece and return their respective imagepath
         image = getImage((color==0) ? "/res/b-time" : "/res/y-time");
@@ -14,7 +14,7 @@ public class Time extends Piece {
 
  
     @Override
-    public boolean MoveValidate(int goCol, int goRow) {
+    public boolean moveValidate(int goCol, int goRow) {
         int currentCol = getCol();
         int currentRow = getRow();
     

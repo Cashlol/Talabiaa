@@ -6,7 +6,7 @@ public class Point extends Piece{
     
     //constuctor to pass color, column and row into super class
     public Point(int color, int col, int row) {
-        super(color, col, row);
+        super(PieceType.POINT, color, col, row);
         this.color=color;
         //check which color is the piece and return their respective imagepath
         image = getImage((color==0) ? "/res/b-point" : "/res/y-point");
