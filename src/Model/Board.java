@@ -1,12 +1,11 @@
 package Model;
 import View.BoardView;
 
-
 import javax.swing.*;
-
 
 import Model.Piece.Hour;
 import Model.Piece.Piece;
+import Model.Piece.Piece.PieceType;
 import Model.Piece.Plus;
 import Model.Piece.Point;
 import Model.Piece.Sun;
@@ -19,10 +18,12 @@ import java.awt.*;
 public class Board extends JPanel{
    
     private static final int BLUE=0,YELLOW=1;
-    protected static final int COLS=7,ROWS=6;
+    public static final int COLS=7,ROWS=6;
     private Piece [][] piece;
     Model.Piece.Mouse mouse;
     private Piece activeP;
+    private Piece checkPiece;
+    private int blueCount, yellowCount;
 
 
     BoardView bv = new BoardView();
@@ -67,7 +68,6 @@ public class Board extends JPanel{
     //initialize board pieces into their respective coordinates
     public void setBoardPiece() {
 
-
         //add point pieces for both yellow and blue
         for(int x=0;x<COLS;x++) {
             addPiece(new Point(YELLOW,x,4));
@@ -105,7 +105,6 @@ public class Board extends JPanel{
             }
             System.out.println(" ");
         }
-
 
         repaint();
     }
@@ -150,7 +149,14 @@ public class Board extends JPanel{
             // Check if the new position is valid
             if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS) {
                 // Check if the target cell is empty or contains an opponent's piece
-                if ((piece[newRow][newCol] == null || activeP.canCapture(newRow, newCol)) && activeP.MoveValidate(newCol, newRow)) {
+                if ((piece[newRow][newCol] == null || activeP.canCapture(newRow, newCol)) && activeP.moveValidate(newCol, newRow)) {
+    
+                    if (activeP.getColor() == 0) {
+                        blueCount++;
+                    } else if (activeP.getColor() == 1) {
+                        yellowCount++;
+                    }
+    
                     // If there is an opponent's piece, remove it
                     if (piece[newRow][newCol] != null && activeP.canCapture(newRow, newCol)) {
                         // Remove the captured piece
@@ -168,6 +174,15 @@ public class Board extends JPanel{
     
                     // Add the piece to the new position
                     this.piece[newRow][newCol] = activeP;
+                    activeP = null;
+    
+                    // Trigger swapping after the piece has been updated
+                   // If both players have moved, swap the pieces and reset the counts
+                   if (blueCount == 1 && yellowCount == 1) {
+                    swapPiece();
+                    blueCount = 0;
+                    yellowCount = 0;
+                }
     
                     repaint();
                 } else {
@@ -178,6 +193,27 @@ public class Board extends JPanel{
                 }
             }
         }
+    }
+    
+    public void swapPiece() {
+        for (int x = 0; x < ROWS; x++) {
+            for (int y = 0; y < COLS; y++) {
+                checkPiece = piece[x][y];
+    
+                if (checkPiece != null) {
+                    // Check if the piece is an Hour or Time piece
+                    if (checkPiece.getPieceType() == PieceType.TIME || checkPiece.getPieceType() == PieceType.PLUS) {
+                        // Swap Hour and Time pieces
+                        if (checkPiece.getPieceType() == PieceType.TIME) {
+                            piece[x][y] = new Plus(checkPiece.getColor(), y, x);
+                        } else if (checkPiece.getPieceType() == PieceType.PLUS) {
+                            piece[x][y] = new Time(checkPiece.getColor(), y, x);
+                        }
+                    }
+                }
+            }
+        }
+        repaint();
     }
     
     public Piece getPiece(int row, int col) {
