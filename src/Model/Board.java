@@ -1,87 +1,59 @@
 package Model;
+
+import Model.Piece.*;
 import View.BoardView;
+import View.GameView;
 
-import javax.swing.*;
 
-import Model.Piece.Hour;
-import Model.Piece.Piece;
-import Model.Piece.Plus;
-import Model.Piece.Point;
-import Model.Piece.Sun;
-import Model.Piece.Time;
-
-import java.awt.*;
-import java.util.ArrayList;
-
-public class Board extends JPanel{
+public class Board{
     
-    private static final int BLUE=0,YELLOW=1;
-    private static final int COLS=7,ROWS=6;
+    public static final int COLS=7,ROWS=6;
     private Piece [][] piece;
-    Model.Piece.Mouse mouse;
-    private Piece activeP;
+    private Piece activePiece;
+    private BoardView bv = new BoardView();
+    private GameView gameView;
+    private Game game;
+    private int posX, posY;
+    private Boolean pressed;
+    // private Mouse mouse;
 
-    BoardView bv = new BoardView();
 
-    // public static ArrayList<Piece> pieces = new ArrayList<>();
-
-    //constructor to initialize the Piece array
+    //initialize the Piece array @Acash @JingYing
     public Board() {
-        setSize(700,700);
         piece = new Piece[ROWS][COLS];
-        activeP= null;// No active piece initially
-        mouse = new Model.Piece.Mouse(this);
-        addMouseMotionListener(mouse);
-        addMouseListener(mouse);
+        game = new Game();
+        activePiece= null;// No active piece initially
+        initializePieces();
+        // addMouseMotionListener(mouse);
+        // addMouseListener(mouse);
     }
 
-    //launch game calls function to initialize the board
-    public void launchGame() {
-        // setPieces();
-        setBoardPiece();
-        // Register the board as an observer
-    }
+    //initialize board pieces into their respective coordinates @Acash
+    public void initializePieces() {
 
-    //set piece based on the given col and row value
-    public void setPiece(Piece piece){
-        this.piece[piece.getRow()][piece.getCol()] = piece;
-        piece.setBoard(this);
-    }
-
-    //add piece based on the given col and row value
-    public void addPiece(Piece piece){
-        this.piece[piece.getRow()][piece.getCol()] = piece;
-        piece.setBoard(this);
-    }
-
-    //initialize board pieces into their respective coordinates
-    public void setBoardPiece() {
-
-        //add point pieces for both yellow and blue
+        //add point piece for yellow and blue
         for(int x=0;x<COLS;x++) {
-            addPiece(new Point(YELLOW,x,4));
-            addPiece(new Point(BLUE,x,1));
+            setPiece(new Point(Color.YELLOW,x,4));
+            setPiece(new Point(Color.BLUE,x,1));
         }
 
-        //add yellow pieces 
-        addPiece(new Plus(YELLOW,0,5));
-        addPiece(new Hour(YELLOW,1,5));
-        addPiece(new Time(YELLOW,2,5));
-        addPiece(new Sun(YELLOW,3,5));
-        addPiece(new Time(YELLOW,4,5));
-        addPiece(new Hour(YELLOW,5,5));
-        addPiece(new Plus(YELLOW,6,5));
-        
-        //add blue pieces
-        addPiece(new Plus(BLUE,0,0));
-        addPiece(new Hour(BLUE,1,0));
-        addPiece(new Time(BLUE,2,0));
-        addPiece(new Sun(BLUE,3,0));
-        addPiece(new Time(BLUE,4,0));
-        addPiece(new Hour(BLUE,5,0));
-        addPiece(new Plus(BLUE,6,0));
+        //add blue and yellow pieces 
+        setPiece(new Plus(Color.YELLOW,0,5));
+        setPiece(new Hour(Color.YELLOW,1,5));
+        setPiece(new Time(Color.YELLOW,2,5));
+        setPiece(new Sun(Color.YELLOW,3,5));
+        setPiece(new Time(Color.YELLOW,4,5));
+        setPiece(new Hour(Color.YELLOW,5,5));
+        setPiece(new Plus(Color.YELLOW,6,5));
+        setPiece(new Plus(Color.BLUE,0,0));
+        setPiece(new Hour(Color.BLUE,1,0));
+        setPiece(new Time(Color.BLUE,2,0));
+        setPiece(new Sun(Color.BLUE,3,0));
+        setPiece(new Time(Color.BLUE,4,0));
+        setPiece(new Hour(Color.BLUE,5,0));
+        setPiece(new Plus(Color.BLUE,6,0));
 
-        //testing the array output for the pieces
+        //print out the 2D piece location
         for(int x=0;x<ROWS;x++) {
             for(int y=0;y<COLS;y++) {
                 if(piece[x][y] != null) {
@@ -92,84 +64,103 @@ public class Board extends JPanel{
             }
             System.out.println(" ");
         }
-
-        repaint();
     }
 
-    public void update() {
-        if (mouse.pressed) {
-            if (activeP == null) {
-                for (int x = 0; x < ROWS; x++) {
-                    for (int y = 0; y < COLS; y++) {
-                        if (piece[x][y] != null && piece[x][y].isMouseOver(mouse.x, mouse.y)) {
-                            activeP = piece[x][y];
-                            System.out.println("Active Piece: " + activeP);
-                            break;  // Stop searching once an active piece is found
-                        }
-                    }
-                }
+    //set piece based on the given col and row value @Acash
+    public void setPiece(Piece piece){
+        this.piece[piece.getRow()][piece.getCol()] = piece;
+        piece.setBoard(this);
+    }
+
+    public Piece getPiece(int col,int row) {
+        return piece[col][row];
+    }
+
+    public Piece [][] getPieces() {
+        return piece;
+    }
+
+    //detect active piece @JingYing
+    public void updatePiece(int posX, int posY, boolean pressed) {
+
+        this.posX = posX;
+        this.posY = posY;
+        this.pressed = pressed;
+        
+        int col = posX / 100; //tile width is 100
+        int row = posY / 100;  //tile height is 100 //to convert pixel to tile coordinate
+
+        //check if the pressed is true
+        if (pressed && activePiece == null) {
+            if (isValidCoordinate(row, col) && piece[row][col] != null) {
+                activePiece = piece[row][col];
             }
-        } else if (activeP != null) {
-            // If the player is holding a piece and the mouse is released, simulate the move
-            simulate();
-            activeP = null;  // Reset the active piece after the move
+        } else if (!pressed && activePiece != null) {
+            movePiece(row, col);
+            activePiece = null;
         }
     }
     
-    private void simulate() {
-        // If a piece is being held, update its position
-        if (activeP != null) {
-            // Set the new position based on the current mouse coordinates
-            int newRow = mouse.y / 100;  // Assuming mouse.y represents the new row
-            int newCol = mouse.x / 100;  // Assuming mouse.x represents the new column
+    //check within bound of board @JingYing
+    private boolean isValidCoordinate(int row, int col) {
+        return row >= 0 && row < ROWS && col >= 0 && col < COLS;
+    }
     
-            // Check if the new position is valid and the cell is empty
-            if (newRow >= 0 && newRow < ROWS && newCol >= 0 && newCol < COLS && piece[newRow][newCol] == null) {
-                // Clear the old position
-                int oldRow = activeP.getRow();
-                int oldCol = activeP.getCol();
+    
+    //update piece location after move @Jing Ying
+    private void movePiece(int newRow, int newCol) {
+
+        if(game.getTurn() != activePiece.getColor()) {
+            System.out.println("You cannot move this piece");
+        } else {
+
+                    // Check if the new position is within the bounds of the board
+        if (isValidCoordinate(newRow, newCol)) {
+            // Check if the target cell is empty or contains an opponent's piece
+            if ((piece[newRow][newCol] == null || activePiece.canCapture(newCol, newRow))
+                    && activePiece.canMove(newCol, newRow)) {
+    
+                // If there is an opponent's piece, remove it
+                if (piece[newRow][newCol] != null && activePiece.canCapture(newCol, newRow)) {
+                    // Remove the captured piece
+                    piece[newRow][newCol].setIsEaten(); 
+                
+                    //check whether the piece eaten is a Sun piece, if true then end the game.(to be refactored)
+                    if(piece[newRow][newCol].getType()=="Sun" && piece[newRow][newCol].checkIfEaten()) {
+                        System.out.println("Game over " + game.getTurn() + " wins ");
+                    }
+
+                    piece[newRow][newCol] = null;   
+
+                }
+    
+                // Clear the old position //without this it cannot go back to its old position.
+                int oldRow = activePiece.getRow();
+                int oldCol = activePiece.getCol();
                 this.piece[oldRow][oldCol] = null;
     
                 // Update the active piece's position
-                activeP.setRow(newRow);
-                activeP.setCol(newCol);
+                activePiece.setPost(newCol, newRow);
     
                 // Add the piece to the new position
-                this.piece[newRow][newCol] = activeP;
+                this.piece[newRow][newCol] = activePiece;
     
-                repaint();
+                System.out.println("\n"+ activePiece.getType() + " moved to Row: " + newRow + ", Col: " + newCol);
+                bv.setBoard(this);
+                bv.updateView();
+                game.changeTurn();
+            } else {
+                System.out.println("Invalid move.");
             }
+        } else {
+            System.out.println("Invalid coordinates.");
         }
-    }
-    
-    // public void flipBoard() {
-
-    //     for (int x = 0; x < ROWS / 2; x++) {
-    //         for (int y = 0; y < COLS; y++) {
-    //             // Swap the pieces in the top and bottom rows
-    //             Piece temp = piece[x][y];
-    //             piece[x][y] = piece[ROWS - 1 - x][y];
-    //             piece[ROWS - 1 - x][y] = temp;
-    //         }
-    //     }
-
-    //     // Redraw the board
-    //     repaint();
-    // }
-
-    //draws the images for each pieces that was passed from the arraylist Piece
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-        bv.draw(g2);
-    
-        // Draw image for each piece that is not null in its updated position
-        for (int x = 0; x < ROWS; x++) {
-            for (int y = 0; y < COLS; y++) {
-                if (piece[x][y] != null) {
-                    piece[x][y].drawAtCurrentPosition(g2);
-                }
-            }
+            
         }
+    
+
+
+
     }
 }
+    
